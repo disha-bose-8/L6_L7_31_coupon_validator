@@ -1,14 +1,51 @@
+from datetime import date
+import math
+
+
 def split_code(code):
-    prefix, value = code.strip().upper().split('-')
-    return prefix, int(value)
+    if not isinstance(code, str):
+        return None
+
+    parts = code.strip().upper().split('-')
+
+    if len(parts) != 2 or not parts[0] or not parts[1]:
+        return None
+
+    if not parts[1].isdigit():
+        return None
+
+    return parts[0], int(parts[1])
+
 
 def most_expensive(prices_csv):
-    prices = [float(p) for p in prices_csv.split(',')]
-    return max(prices)
+    if not isinstance(prices_csv, str) or not prices_csv.strip():
+        return None
+
+    try:
+        prices = [float(p.strip()) for p in prices_csv.split(',')]
+
+        if not prices or any(
+            not math.isfinite(p) or p < 0 for p in prices
+        ):
+            return None
+
+        return max(prices)
+
+    except ValueError:
+        return None
+
 
 def expiry_days(date_text):
-    year, month, day = [int(p) for p in date_text.split('-')]
-    return (year - 2024) * 365 + (month - 1) * 30 + day
+    if not isinstance(date_text, str):
+        return None
+
+    try:
+        expiry_date = date.fromisoformat(date_text)
+        return (expiry_date - date.today()).days
+
+    except ValueError:
+        return None
+
 
 def main():
     print("==== Running split_code ====")
@@ -24,7 +61,8 @@ def main():
     print("\n==== Running expiry_days ====")
     user_input = input("Enter an expiry date as YYYY-MM-DD: ")
     result = expiry_days(user_input)
-    print("Days Since 2024:", result)
+    print("Days Until Expiry:", result)
+
 
 if __name__ == "__main__":
     main()
